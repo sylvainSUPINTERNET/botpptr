@@ -14,6 +14,7 @@ const WorkspaceForm = (props) => {
     const [login, setLogin] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [swipe, setSwipe] = React.useState(1);
+    const [synchronizeKey, setSynchronizeKey] = React.useState("");
 
     let [collectedProfiles, setCollectedProfiles] = React.useState([]);
     let [collectedLiveProfiles, setCollectedLiveProfiles] = React.useState([]);
@@ -23,8 +24,8 @@ const WorkspaceForm = (props) => {
     }
 
 
-    const [subHash, setSubHash] = React.useState("");
-    const [sharedSubHash, setSharedSubHash] = React.useState("");
+    const [subHash, setSubHash] = React.useState(localStorage.getItem("subKey") ? localStorage.getItem("subKey") : "");
+    const [sharedSubHash, setSharedSubHash] = React.useState(localStorage.getItem("subSharedKey") ? localStorage.getItem("subSharedKey") : "");
 
     const submitForm = (ev) => {
         if ( login !== "" && password !== "" ) {
@@ -32,6 +33,7 @@ const WorkspaceForm = (props) => {
 
             wsClient.onmessage = async (ev) => {
               let data = JSON.parse(ev.data);
+              console.log("RECEIVED", data);
 
               let {source, type, subKey, subSharedKey} = data;
 
@@ -67,6 +69,27 @@ const WorkspaceForm = (props) => {
         }
     }
 
+    const submitSync = (ev) => {
+        const wsClientSync = new W3CWebSocket(wsConfig.WS_URL + `?key=${synchronizeKey}`);
+
+        wsClientSync.onmessage = async (ev) => {
+            let data = JSON.parse(ev.data);
+            console.log("RECEIVED SYNCHRONIZATION", data);
+
+            let {source, type, subKey, subSharedKey} = data;
+
+            if ( data.type === wsConfig.BUMBLE_ANALYSIS_ROFILE /*&& subKey === localStorage.getItem("subKey") && subSharedKey === localStorage.getItem("subSharedKey")*/) {
+                console.log("RECEIVED SYNCHRONIZATION PROFILE : ");
+                console.log(subHash)
+                console.log(sharedSubHash)
+                console.log(data)
+                collectedLiveProfiles = [...collectedLiveProfiles, data];
+                setCollectedLiveProfiles(collectedLiveProfiles);
+            }
+
+          }
+    }
+
 
 
     if ( props.source === appConfig.SOURCE_TARGET_NAME_BUMBLE) {
@@ -88,7 +111,7 @@ const WorkspaceForm = (props) => {
                 </Box>
                 <Box flexGrow="1" mt={5} mb={5}>
                 <FormControl>
-                        <InputLabel htmlFor="bot-fb-credentials-password">Swipe</InputLabel>
+                        <InputLabel htmlFor="bot-number-swipe">Swipe</InputLabel>
                         <Input type="number" id="bot-number-swipe" aria-describedby="swipe" value={swipe} onChange={ (ev) => setSwipe(ev.target.value)}/>
                     </FormControl>
                 </Box>
@@ -103,6 +126,15 @@ const WorkspaceForm = (props) => {
                     <h3>Analysis</h3>
                     <Box>Your secret key : {subHash}</Box>
                     <Box>You shared key : {sharedSubHash}</Box>
+                    <h3> Synchronize with analysis</h3>
+                    <small>Using your key / invit key to synchronize with processing analysis</small>
+                    <Box flexGrow="1" mt={5} mb={5}>
+                        <FormControl>
+                            <InputLabel htmlFor="bot-synchronize">Synchronize</InputLabel>
+                            <Input type="text" id="bot-synchronize" aria-describedby="synchronize" value={synchronizeKey} placeholder="<your key>" onChange={ (ev) => setSynchronizeKey(ev.target.value)}/>
+                        </FormControl>
+                        <Button variant="outlined" color="primary" onClick={submitSync}>Synchronize</Button>
+                    </Box>
                     <ProfileCard collected={collectedProfiles} collectedLive={collectedLiveProfiles}></ProfileCard>
                 </Box>
         </Box>
