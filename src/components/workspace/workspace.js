@@ -1,7 +1,8 @@
 import React from 'react';
 
-import {AppBar, Toolbar, IconButton, Typography, Button, Container, Box, Tabs, Paper, Tab, Drawer,Divider, List, ListItem, ListItemText, FormControl, InputLabel, Input, FormHelperText,OutlinedInput} from "@material-ui/core"
-import Build from '@material-ui/icons/BuildOutlined';
+import {AppBar, Toolbar, IconButton, Typography, Button, Container, Box, Tabs, Paper, Tab, Drawer,Divider, List, ListItem, ListItemText, FormControl, InputLabel, Input, FormHelperText,OutlinedInput, Card, CardContent} from "@material-ui/core"
+import { Build, School } from '@material-ui/icons';
+
 import {appConfig} from "../common/utils";
 import {wsConfig} from "../common/wsConfig";
 
@@ -178,9 +179,30 @@ export const ProfileCard = (props) => {
                     <h3>Live</h3>
                     {
                         collectedLive.map( profile => {
-                            return <div>
-                                {profile.name}
-                                </div>
+                            return <Box mt={3} mb={3}>
+                                <Card>  
+                                    <CardContent>
+                                    <Typography>
+                                    {profile.name}
+                                    </Typography>
+                                        <Typography>
+                                        <div style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                flexWrap: 'wrap',
+                                            }}>
+                                                {profile.proTitle === "" ? "Pas de job / étude" : profile.proTitle} <School m={5}/>
+                                            </div>  
+                                        </Typography>
+                                        <Typography>
+                                            {profile.age} ans
+                                        </Typography>
+                                        <Typography variant="body2" color="textSecondary" component="p">
+                                            {profile.description.length === 0 ? "Pas de description": profile.description}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                                </Box>
                         })
                     }
                 </Box>
