@@ -16,6 +16,7 @@ const WorkspaceForm = (props) => {
     const [password, setPassword] = React.useState("");
     const [swipe, setSwipe] = React.useState(1);
     const [synchronizeKey, setSynchronizeKey] = React.useState("");
+    const [keyForExportCsv, setKeyForExportCsv] = React.useState("");
 
     let [collectedProfiles, setCollectedProfiles] = React.useState([]);
     let [collectedLiveProfiles, setCollectedLiveProfiles] = React.useState([]);
@@ -127,6 +128,25 @@ const WorkspaceForm = (props) => {
                     <h3>Analysis</h3>
                     <Box>Your secret key : {subHash}</Box>
                     <Box>You shared key : {sharedSubHash}</Box>
+                    <Card>
+                        <CardContent>
+                            <FormControl>
+                                <InputLabel htmlFor="bot-csv-export">Key for export</InputLabel>
+                                <Input type="text" id="bot-csv-export" aria-describedby="key-for-export" value={keyForExportCsv} placeholder="<your key>" onChange={ (ev) => setKeyForExportCsv(ev.target.value)}/>
+                                {keyForExportCsv === "" ? <div>No key provided</div> : 
+                                <a href={`https://localhost:3000/bot/swapper/bumble/export?format=csv&key=${keyForExportCsv}`} target="_blank" rel="noopener noreferrer" download>
+                                    <Button>
+                                        <i className="fas fa-download"/>
+                                        Download CSV from analysis
+                                    </Button>
+                                </a>}
+                            </FormControl>
+                            
+                            {/*
+                                                        
+                            */}
+                        </CardContent>
+                    </Card>
                     <h3> Synchronize with analysis</h3>
                     <small>Using your key / invit key to synchronize with processing analysis</small>
                     <Box flexGrow="1" mt={5} mb={5}>
@@ -200,6 +220,13 @@ export const ProfileCard = (props) => {
                                         <Typography variant="body2" color="textSecondary" component="p">
                                             {profile.description.length === 0 ? "Pas de description": profile.description}
                                         </Typography>
+                                        <Typography>
+                                            {profile.citiesInfo}
+                                        </Typography>
+                                        <Typography>
+                                            {profile.from} {profile.liveIn}
+                                        </Typography>
+                                       
                                     </CardContent>
                                 </Card>
                                 </Box>
